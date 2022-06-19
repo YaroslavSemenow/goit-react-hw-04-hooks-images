@@ -1,7 +1,14 @@
-export default function ImageGalleryItem() {
+import PropTypes from 'prop-types';
+
+export default function ImageGalleryItem({ url, tags = 'cat' }) {
   return (
-    <li class="gallery-item">
-      <img src="" alt="" />
+    <li className="gallery-item">
+      <img src={url} alt={tags} />
     </li>
   );
 }
+
+ImageGalleryItem.propTypes = {
+  url: PropTypes.string.isRequired,
+  tags: PropTypes.string,
+};
