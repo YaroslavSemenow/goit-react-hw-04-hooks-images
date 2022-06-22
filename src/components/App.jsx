@@ -1,7 +1,9 @@
 import { Component } from 'react';
 import { getPhotos } from 'service/Api-service';
 import Searchbar from './Searchbar';
+import Loader from './Loader';
 import ImageGallery from './ImageGallery';
+import Modal from './Modal';
 import Button from './Button';
 
 class App extends Component {
@@ -9,10 +11,15 @@ class App extends Component {
     photos: [],
     query: '',
     page: 1,
-    isLoadMore: false,
+    isLoading: false,
+    ShowLoadMoreBtn: false,
   };
 
   handlerSubmitForm = async query => {
+    this.setState({
+      isLoading: true,
+    });
+
     try {
       const photos = await getPhotos(query);
       const photosArr = photos.hits;
@@ -22,7 +29,8 @@ class App extends Component {
         photos: photosArr,
         query,
         page: 1,
-        isLoadMore: totalPhotos > 12 && true,
+        isLoading: false,
+        ShowLoadMoreBtn: totalPhotos > 12 && true,
       });
     } catch (error) {
       console.log(error);
@@ -33,6 +41,10 @@ class App extends Component {
     const { query, page } = this.state;
     const nextPage = page + 1;
 
+    this.setState({
+      isLoading: true,
+    });
+
     try {
       const photos = await getPhotos(query, nextPage);
       const photosArr = photos.hits;
@@ -41,7 +53,8 @@ class App extends Component {
         return {
           photos: [...photos, ...photosArr],
           page: nextPage,
-          isLoadMore: photosArr.length === 12,
+          isLoading: false,
+          ShowLoadMoreBtn: photosArr.length === 12,
         };
       });
     } catch (error) {
@@ -50,13 +63,15 @@ class App extends Component {
   };
 
   render() {
-    const { photos, isLoadMore } = this.state;
+    const { photos, isLoading, ShowLoadMoreBtn } = this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handlerSubmitForm} />
         <ImageGallery photos={photos} />
-        {isLoadMore && <Button onLoadMore={this.getMorePhotos} />}
+        {isLoading && <Loader />}
+        {ShowLoadMoreBtn && <Button onLoadMore={this.getMorePhotos} />}
+        <Modal></Modal>
       </div>
     );
   }
