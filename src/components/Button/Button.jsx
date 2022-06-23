@@ -1,11 +1,14 @@
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
+import style from './Button.module.css';
 
 export default function Button({ onLoadMore }) {
   return (
-    <button type="button" onClick={onLoadMore}>
-      Load more
-    </button>
+    <div className={style.wrap}>
+      <button className={style.button} type="button" onClick={onLoadMore}>
+        Load more
+      </button>
+    </div>
   );
 }
 
-// Button.propTypes = { loadMore: propTypes.func.isRec }
+Button.propTypes = { loadMore: PropTypes.func };

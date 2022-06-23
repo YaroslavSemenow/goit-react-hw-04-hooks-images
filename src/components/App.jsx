@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import style from './App.module.css';
 import { getPhotos } from 'service/Api-service';
 import Searchbar from './Searchbar';
 import Loader from './Loader';
@@ -11,14 +12,14 @@ class App extends Component {
     photos: [],
     query: '',
     page: 1,
-    error: false,
     isLoading: false,
-    ShowLoadMoreBtn: false,
+    showLoadMoreBtn: false,
+    showModal: false,
+    modalImg: '',
   };
 
   handlerSubmitForm = async query => {
     this.setState({
-      error: false,
       isLoading: true,
     });
 
@@ -36,11 +37,13 @@ class App extends Component {
         query,
         page: 1,
         isLoading: false,
-        ShowLoadMoreBtn: totalPhotos > 12 && true,
+        showLoadMoreBtn: totalPhotos > 12 && true,
       });
     } catch (error) {
       console.log(error);
-      this.setState({ error: true, isLoading: false });
+      this.setState({ isLoading: false });
+
+      alert('Oops, something went wrong. Please, reload the page');
     }
   };
 
@@ -49,7 +52,6 @@ class App extends Component {
     const nextPage = page + 1;
 
     this.setState({
-      error: false,
       isLoading: true,
     });
 
@@ -62,26 +64,40 @@ class App extends Component {
           photos: [...photos, ...photosArr],
           page: nextPage,
           isLoading: false,
-          ShowLoadMoreBtn: photosArr.length === 12,
+          showLoadMoreBtn: photosArr.length === 12,
         };
       });
     } catch (error) {
       console.log(error);
-      this.setState({ error: true, isLoading: false });
+      this.setState({ isLoading: false });
+
+      alert('Oops, something went wrong. Please, reload the page');
     }
   };
 
+  getModalImg = url => {
+    this.setState({ modalImg: url });
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  };
+
   render() {
-    const { photos, error, isLoading, ShowLoadMoreBtn } = this.state;
+    const { photos, isLoading, showLoadMoreBtn, ShowModal, modalImg } =
+      this.state;
 
     return (
-      <div>
+      <div className={style.app}>
         <Searchbar onSubmit={this.handlerSubmitForm} />
-        <ImageGallery photos={photos} />
-        {error && alert('Oops, something went wrong. Please, reload the page')}
+        <ImageGallery photos={photos} onItemClick={this.getModalImg} />
         {isLoading && <Loader />}
-        {ShowLoadMoreBtn && <Button onLoadMore={this.getMorePhotos} />}
-        <Modal></Modal>
+        {showLoadMoreBtn && <Button onLoadMore={this.getMorePhotos} />}
+        {ShowModal && (
+          <Modal onClose={this.openModal}>
+            <img src={modalImg} alt="" />
+          </Modal>
+        )}
       </div>
     );
   }
