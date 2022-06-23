@@ -11,7 +11,7 @@ class Searchbar extends Component {
   };
 
   handleInputChange = e => {
-    const text = e.target.value.trim();
+    const text = e.target.value;
 
     this.setState({ query: text });
   };

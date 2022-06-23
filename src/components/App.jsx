@@ -11,12 +11,14 @@ class App extends Component {
     photos: [],
     query: '',
     page: 1,
+    error: false,
     isLoading: false,
     ShowLoadMoreBtn: false,
   };
 
   handlerSubmitForm = async query => {
     this.setState({
+      error: false,
       isLoading: true,
     });
 
@@ -24,6 +26,10 @@ class App extends Component {
       const photos = await getPhotos(query);
       const photosArr = photos.hits;
       const totalPhotos = photos.totalHits;
+
+      if (totalPhotos === 0) {
+        alert('Please enter a valid request');
+      }
 
       this.setState({
         photos: photosArr,
@@ -34,6 +40,7 @@ class App extends Component {
       });
     } catch (error) {
       console.log(error);
+      this.setState({ error: true, isLoading: false });
     }
   };
 
@@ -42,6 +49,7 @@ class App extends Component {
     const nextPage = page + 1;
 
     this.setState({
+      error: false,
       isLoading: true,
     });
 
@@ -59,16 +67,18 @@ class App extends Component {
       });
     } catch (error) {
       console.log(error);
+      this.setState({ error: true, isLoading: false });
     }
   };
 
   render() {
-    const { photos, isLoading, ShowLoadMoreBtn } = this.state;
+    const { photos, error, isLoading, ShowLoadMoreBtn } = this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handlerSubmitForm} />
         <ImageGallery photos={photos} />
+        {error && alert('Oops, something went wrong. Please, reload the page')}
         {isLoading && <Loader />}
         {ShowLoadMoreBtn && <Button onLoadMore={this.getMorePhotos} />}
         <Modal></Modal>
