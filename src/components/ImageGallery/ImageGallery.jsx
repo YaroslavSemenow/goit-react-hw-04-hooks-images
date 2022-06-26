@@ -10,7 +10,7 @@ export default function ImageGallery({ photos, ...otherProps }) {
           key={id}
           otherProps={otherProps}
           url={webformatURL}
-          alt={tags}
+          tags={tags}
           largeImageURL={largeImageURL}
         />
       ))}
@@ -20,4 +20,8 @@ export default function ImageGallery({ photos, ...otherProps }) {
 
 ImageGallery.propTypes = {
   photos: PropTypes.arrayOf(PropTypes.object).isRequired,
+  otherProps: PropTypes.shape({
+    getModalImg: PropTypes.func.isRequired,
+    openModal: PropTypes.func.isRequired,
+  }),
 };

@@ -3,7 +3,7 @@ import style from './ImageGalleryItem.module.css';
 
 export default function ImageGalleryItem({
   url,
-  tags = 'cat',
+  tags,
   largeImageURL,
   otherProps,
 }) {
@@ -24,5 +24,10 @@ export default function ImageGalleryItem({
 
 ImageGalleryItem.propTypes = {
   url: PropTypes.string.isRequired,
-  tags: PropTypes.string,
+  tags: PropTypes.string.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+  otherProps: PropTypes.shape({
+    getModalImg: PropTypes.func.isRequired,
+    openModal: PropTypes.func.isRequired,
+  }).isRequired,
 };
