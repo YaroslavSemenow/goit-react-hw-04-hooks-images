@@ -15,7 +15,10 @@ class App extends Component {
     isLoading: false,
     showLoadMoreBtn: false,
     showModal: false,
-    modalImg: '',
+    modalImg: {
+      src: '',
+      alt: '',
+    },
   };
 
   handlerSubmitForm = async query => {
@@ -75,8 +78,13 @@ class App extends Component {
     }
   };
 
-  getModalImg = url => {
-    this.setState({ modalImg: url });
+  getModalImg = (src, alt) => {
+    this.setState({
+      modalImg: {
+        src,
+        alt,
+      },
+    });
   };
 
   toggleModal = () => {
@@ -84,18 +92,22 @@ class App extends Component {
   };
 
   render() {
-    const { photos, isLoading, showLoadMoreBtn, ShowModal, modalImg } =
+    const { photos, isLoading, showLoadMoreBtn, showModal, modalImg } =
       this.state;
 
     return (
       <div className={style.app}>
         <Searchbar onSubmit={this.handlerSubmitForm} />
-        <ImageGallery photos={photos} onItemClick={this.getModalImg} />
+        <ImageGallery
+          photos={photos}
+          getModalImg={this.getModalImg}
+          openModal={this.toggleModal}
+        />
         {isLoading && <Loader />}
         {showLoadMoreBtn && <Button onLoadMore={this.getMorePhotos} />}
-        {ShowModal && (
-          <Modal onClose={this.openModal}>
-            <img src={modalImg} alt="" />
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <img src={modalImg.src} alt={modalImg.alt} />
           </Modal>
         )}
       </div>

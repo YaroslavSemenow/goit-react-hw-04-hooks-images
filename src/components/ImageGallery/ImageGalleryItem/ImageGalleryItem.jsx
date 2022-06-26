@@ -4,13 +4,18 @@ import style from './ImageGalleryItem.module.css';
 export default function ImageGalleryItem({
   url,
   tags = 'cat',
-  onItemClick,
   largeImageURL,
+  otherProps,
 }) {
+  const { getModalImg, openModal } = otherProps;
+
   return (
     <li
       className={style.gallery__item}
-      onClick={() => onItemClick(largeImageURL)}
+      onClick={() => {
+        getModalImg(largeImageURL, tags);
+        openModal();
+      }}
     >
       <img className={style.gallery__image} src={url} alt={tags} />
     </li>
