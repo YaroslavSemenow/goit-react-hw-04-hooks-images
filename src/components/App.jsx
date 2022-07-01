@@ -21,61 +21,60 @@ class App extends Component {
     },
   };
 
-  handlerSubmitForm = async query => {
-    this.setState({
-      isLoading: true,
-    });
-
-    try {
-      const photos = await getPhotos(query);
-      const photosArr = photos.hits;
-      const totalPhotos = photos.totalHits;
-
-      if (totalPhotos === 0) {
-        alert('Please enter a valid request');
-      }
-
+  componentDidUpdate = async (_, prevState) => {
+    if (
+      this.state.query !== prevState.query ||
+      this.state.page !== prevState.page
+    ) {
       this.setState({
-        photos: photosArr,
-        query,
-        page: 1,
-        isLoading: false,
-        showLoadMoreBtn: totalPhotos > 12 && true,
+        isLoading: true,
       });
-    } catch (error) {
-      console.log(error);
-      this.setState({ isLoading: false });
 
-      alert('Oops, something went wrong. Please, reload the page');
+      const { photos, query, page } = this.state;
+
+      try {
+        const data = await getPhotos(query, page);
+        const totalPhotos = data.totalHits;
+        const newPhotos = data.hits.map(
+          ({ id, webformatURL, largeImageURL, tags }) => ({
+            id,
+            webformatURL,
+            largeImageURL,
+            tags,
+          })
+        );
+
+        if (totalPhotos === 0) {
+          alert('Please enter a valid query');
+          return;
+        }
+
+        this.setState({
+          photos: [...photos, ...newPhotos],
+          showLoadMoreBtn: newPhotos.length === 12 && totalPhotos > 12,
+        });
+      } catch (error) {
+        console.log(error);
+        alert('Oops, something went wrong. Please, reload the page');
+      } finally {
+        this.setState({ isLoading: false });
+      }
     }
   };
 
-  getMorePhotos = async () => {
-    const { query, page } = this.state;
-    const nextPage = page + 1;
-
+  handlerSubmitForm = async query => {
     this.setState({
-      isLoading: true,
+      photos: [],
+      query,
+      page: 1,
+      showLoadMoreBtn: false,
     });
+  };
 
-    try {
-      const photos = await getPhotos(query, nextPage);
-      const photosArr = photos.hits;
-
-      this.setState(({ photos }) => {
-        return {
-          photos: [...photos, ...photosArr],
-          page: nextPage,
-          isLoading: false,
-          showLoadMoreBtn: photosArr.length === 12,
-        };
-      });
-    } catch (error) {
-      console.log(error);
-      this.setState({ isLoading: false });
-
-      alert('Oops, something went wrong. Please, reload the page');
-    }
+  getMorePhotos = async () => {
+    this.setState(({ page }) => ({
+      page: page + 1,
+    }));
   };
 
   getModalImg = (src, alt) => {
@@ -98,11 +97,13 @@ class App extends Component {
     return (
       <div className={style.app}>
         <Searchbar onSubmit={this.handlerSubmitForm} />
-        <ImageGallery
-          photos={photos}
-          getModalImg={this.getModalImg}
-          openModal={this.toggleModal}
-        />
+        {photos.length > 0 && (
+          <ImageGallery
+            photos={photos}
+            getModalImg={this.getModalImg}
+            openModal={this.toggleModal}
+          />
+        )}
         {isLoading && <Loader />}
         {showLoadMoreBtn && <Button onLoadMore={this.getMorePhotos} />}
         {showModal && (
