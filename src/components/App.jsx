@@ -45,7 +45,7 @@ class App extends Component {
         );
 
         if (totalPhotos === 0) {
-          alert('Please enter a valid query');
+          alert(`No results found for '${query}'`);
           return;
         }
 
