@@ -28,6 +28,7 @@ class App extends Component {
     ) {
       this.setState({
         isLoading: true,
+        showLoadMoreBtn: false,
       });
 
       const { photos, query, page } = this.state;
@@ -67,7 +68,6 @@ class App extends Component {
       photos: [],
       query,
       page: 1,
-      showLoadMoreBtn: false,
     });
   };
 
